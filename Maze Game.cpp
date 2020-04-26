@@ -12,16 +12,14 @@ ALLEGRO_BITMAP* greenBlock = NULL;
 const int FPS = 1 / 1;
 
 int level[] = {
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+	0
 };
 
 int draw() {
-	al_clear_to_color(al_map_rgb(0, 0, 0));
+	al_clear_to_color(al_map_rgb(255, 0, 0));
 	for (int i = 0; i < sizeof(level)/sizeof(level[0]); ++i) {
 		if (level[i] == 1) {
-			al_draw_bitmap(greenBlock, ((i%15)*50)+140, ((i-(i%15))/15)*25, 0);
+			al_draw_bitmap(greenBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 140, (((i - (i % 15)) / 15) * 25)+10, 0);
 		}
 	}
 	al_flip_display();
