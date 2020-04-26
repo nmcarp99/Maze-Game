@@ -8,11 +8,17 @@ ALLEGRO_TIMER* timer = NULL;
 // allegro bitmaps
 ALLEGRO_BITMAP* icon = NULL;
 ALLEGRO_BITMAP* greenBlock = NULL;
+ALLEGRO_BITMAP* redBlock = NULL;
+ALLEGRO_BITMAP* yellowBlock = NULL;
+ALLEGRO_BITMAP* blueBlock = NULL;
 
 const int FPS = 1 / 1;
 
 int level[] = {
-	0
+	1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3,
+	2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4,
+	3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1,
+	4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2
 };
 
 int draw() {
@@ -20,6 +26,15 @@ int draw() {
 	for (int i = 0; i < sizeof(level)/sizeof(level[0]); ++i) {
 		if (level[i] == 1) {
 			al_draw_bitmap(greenBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 140, (((i - (i % 15)) / 15) * 25)+10, 0);
+		}
+		else if (level[i] == 2) {
+			al_draw_bitmap(redBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 140, (((i - (i % 15)) / 15) * 25) + 10, 0);
+		}
+		else if (level[i] == 3) {
+			al_draw_bitmap(yellowBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 140, (((i - (i % 15)) / 15) * 25) + 10, 0);
+		}
+		else if (level[i] == 4) {
+			al_draw_bitmap(blueBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 140, (((i - (i % 15)) / 15) * 25) + 10, 0);
 		}
 	}
 	al_flip_display();
@@ -35,6 +50,9 @@ int main()
 	// load bitmaps
 	icon = al_load_bitmap("icon.jpg");
 	greenBlock = al_load_bitmap("greenBlock.png");
+	redBlock = al_load_bitmap("redBlock.png");
+	yellowBlock = al_load_bitmap("yellowBlock.png");
+	blueBlock = al_load_bitmap("blueBlock.png");
 
 	// timer
 	timer = al_create_timer(FPS);
