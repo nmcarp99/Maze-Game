@@ -7,34 +7,49 @@ ALLEGRO_TIMER* timer = NULL;
 
 // allegro bitmaps
 ALLEGRO_BITMAP* icon = NULL;
-ALLEGRO_BITMAP* greenBlock = NULL;
 ALLEGRO_BITMAP* redBlock = NULL;
-ALLEGRO_BITMAP* yellowBlock = NULL;
+ALLEGRO_BITMAP* greenBlock = NULL;
 ALLEGRO_BITMAP* blueBlock = NULL;
+ALLEGRO_BITMAP* yellowBlock = NULL;
+ALLEGRO_BITMAP* moveBlock = NULL;
 
 const int FPS = 1 / 1;
 
 int level[] = {
-	1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3,
-	2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4,
-	3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1,
-	4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2
+	1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5,
+	2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1,
+	3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2,
+	4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3,
+	5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4,
+	1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5,
+	2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1,
+	3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2,
+	4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3,
+	5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4,
+	1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5,
+	2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1,
+	3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2,
+	4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3,
+	5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4
 };
 
 int draw() {
 	al_clear_to_color(al_map_rgb(255, 0, 0));
 	for (int i = 0; i < sizeof(level)/sizeof(level[0]); ++i) {
 		if (level[i] == 1) {
-			al_draw_bitmap(greenBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 140, (((i - (i % 15)) / 15) * 25)+10, 0);
+			al_draw_bitmap(redBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
 		}
 		else if (level[i] == 2) {
-			al_draw_bitmap(redBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 140, (((i - (i % 15)) / 15) * 25) + 10, 0);
+			al_draw_bitmap(greenBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
 		}
 		else if (level[i] == 3) {
-			al_draw_bitmap(yellowBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 140, (((i - (i % 15)) / 15) * 25) + 10, 0);
+			al_draw_bitmap(blueBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
 		}
 		else if (level[i] == 4) {
-			al_draw_bitmap(blueBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 140, (((i - (i % 15)) / 15) * 25) + 10, 0);
+			al_draw_bitmap(yellowBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
+		}
+		else if (level[i] == 5) {
+			al_draw_bitmap(moveBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
 		}
 	}
 	al_flip_display();
@@ -49,10 +64,11 @@ int main()
 
 	// load bitmaps
 	icon = al_load_bitmap("icon.jpg");
-	greenBlock = al_load_bitmap("greenBlock.png");
 	redBlock = al_load_bitmap("redBlock.png");
-	yellowBlock = al_load_bitmap("yellowBlock.png");
+	greenBlock = al_load_bitmap("greenBlock.png");
 	blueBlock = al_load_bitmap("blueBlock.png");
+	yellowBlock = al_load_bitmap("yellowBlock.png");
+	moveBlock = al_load_bitmap("moveBlock.png");
 
 	// timer
 	timer = al_create_timer(FPS);
@@ -63,7 +79,7 @@ int main()
 
 	// create allegro display
 	al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE);
-	display = al_create_display(1080, 640);
+	display = al_create_display(1125, 640);
 	al_set_window_title(display, "Maze Game");
 	al_set_display_icon(display, icon);
 
