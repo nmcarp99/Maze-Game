@@ -1,3 +1,4 @@
+#include <iostream>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
@@ -56,7 +57,7 @@ int playerPos = 0;
 
 int getLevelPositioning() {
 	for (int i = 0; i < 225; i++) {
-		levelWidthPosition[i] = ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 197.5 + ((1080/2)-387.5);
+		levelWidthPosition[i] = ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 197.5 + ((1080 / 2) - 387.5);
 		levelHeightPosition[i] = (((i - (i % 15)) / 15) * 25) + 160 + ((640 / 2) - 292.5);
 	}
 	return 0;
@@ -87,6 +88,40 @@ int draw() {
 		}
 	}
 	al_flip_display();
+	return 0;
+}
+
+int checkJoystick(ALLEGRO_EVENT event) {
+	switch (event.joystick.button) {
+	case 11: // left
+		if (level[playerPos - 1] == 0 && playerPos - 1 >= 0) {
+			level[playerPos - 1] = 6;
+			level[playerPos] = 0;
+			playerPos -= 1;
+		}
+		break;
+	case 12: // down
+		if (level[playerPos + 15] == 0 && playerPos + 15 <= 224) {
+			level[playerPos + 15] = 6;
+			level[playerPos] = 0;
+			playerPos += 15;
+		}
+		break;
+	case 13: // up
+		if (level[playerPos - 15] == 0 && playerPos - 15 >= 0) {
+			level[playerPos - 15] = 6;
+			level[playerPos] = 0;
+			playerPos -= 15;
+		}
+		break;
+	case 10: // right
+		if (level[playerPos + 1] == 0 && playerPos + 1 <= 224) {
+			level[playerPos + 1] = 6;
+			level[playerPos] = 0;
+			playerPos += 1;
+		}
+		break;
+	}
 	return 0;
 }
 
@@ -232,6 +267,8 @@ int main()
 			switch (event.type)
 			{
 			case ALLEGRO_EVENT_JOYSTICK_BUTTON_UP:
+				checkJoystick(event);
+				break;
 			case ALLEGRO_EVENT_DISPLAY_CLOSE:
 				running = false;
 				break;
