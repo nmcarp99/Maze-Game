@@ -14,10 +14,12 @@ ALLEGRO_BITMAP* yellowBlock = NULL;
 ALLEGRO_BITMAP* moveBlock = NULL;
 ALLEGRO_BITMAP* mazePlayer = NULL;
 
-const int FPS = 1 / 1;
+const float FPS = 1.0 / 1;
+int levelWidthPosition[225] = {};
+int levelHeightPosition[225] = {};
 
 int level[] = {
-	1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5,
+	6, 0, 0, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5,
 	2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1,
 	3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2,
 	4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3,
@@ -30,16 +32,27 @@ int level[] = {
 	1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5,
 	2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1,
 	3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2,
-	4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 6, 0, 0,
-	5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 0, 0, 0
+	4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3,
+	5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4
 };
+
+int playerPos[2] = { 0, 0 };
+
+int getLevelPositioning() {
+//	for (int i = 0; i < 225; i++) {
+	int i = 0;
+		levelWidthPosition[i] = ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350;
+		levelHeightPosition[i] = (((i - (i % 15)) / 15) * 25) + 160;
+//	}
+	return 0;
+}
 
 int draw() {
 	al_clear_to_color(al_map_rgb(255, 0, 0));
-	for (int i = 0; i < sizeof(level)/sizeof(level[0]); ++i) {
+	for (int i = 0; i < 225; ++i) {
 		switch (level[i]) {
 		case 1:
-			al_draw_bitmap(redBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
+			al_draw_bitmap(redBlock, levelWidthPosition[i], (((i - (i % 15)) / 15) * 25) + 160, 0);
 			break;
 		case 2:
 			al_draw_bitmap(greenBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
@@ -67,6 +80,7 @@ int main()
 	// initialize allegro
 	al_init();
 	al_init_image_addon();
+	al_install_keyboard();
 
 	// load bitmaps
 	icon = al_load_bitmap("icon.jpg");
@@ -94,15 +108,26 @@ int main()
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 
+	// create map positioning
+	getLevelPositioning();
+
 	bool running = true;
 
 	while (running)
 	{
 		ALLEGRO_EVENT event;
 		ALLEGRO_TIMEOUT timeout;
+		ALLEGRO_KEYBOARD_STATE state;
 
 		al_init_timeout(&timeout, FPS);
+		al_get_keyboard_state(&state);
 		al_wait_for_event_until(event_queue, &event, &timeout);
+
+		if (al_key_down(&state, ALLEGRO_KEY_RIGHT) && level[playerPos[0] + 1] == 0) {
+			level[playerPos[0] + 1] = 6;
+			level[playerPos[0]] = 0;
+			playerPos[0] += 1;
+		}
 
 		switch (event.type)
 		{
