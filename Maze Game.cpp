@@ -2,6 +2,7 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_native_dialog.h>
 
 ALLEGRO_DISPLAY* display = NULL;
 ALLEGRO_EVENT_QUEUE* event_queue = NULL;
@@ -154,6 +155,7 @@ int main()
 	al_init();
 	al_init_image_addon();
 	al_install_keyboard();
+	al_install_joystick();
 	al_init_acodec_addon();
 	al_install_audio();
 
@@ -195,6 +197,7 @@ int main()
 	// register event sources
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
+	al_register_event_source(event_queue, al_get_joystick_event_source());
 
 	// create map positioning
 	getLevelPositioning();
@@ -228,6 +231,7 @@ int main()
 
 			switch (event.type)
 			{
+			case ALLEGRO_EVENT_JOYSTICK_BUTTON_UP:
 			case ALLEGRO_EVENT_DISPLAY_CLOSE:
 				running = false;
 				break;
