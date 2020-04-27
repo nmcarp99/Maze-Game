@@ -12,6 +12,7 @@ ALLEGRO_BITMAP* greenBlock = NULL;
 ALLEGRO_BITMAP* blueBlock = NULL;
 ALLEGRO_BITMAP* yellowBlock = NULL;
 ALLEGRO_BITMAP* moveBlock = NULL;
+ALLEGRO_BITMAP* mazePlayer = NULL;
 
 const int FPS = 1 / 1;
 
@@ -29,27 +30,32 @@ int level[] = {
 	1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5,
 	2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1,
 	3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2,
-	4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3,
-	5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4
+	4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 6, 0, 0,
+	5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 0, 0, 0
 };
 
 int draw() {
 	al_clear_to_color(al_map_rgb(255, 0, 0));
 	for (int i = 0; i < sizeof(level)/sizeof(level[0]); ++i) {
-		if (level[i] == 1) {
+		switch (level[i]) {
+		case 1:
 			al_draw_bitmap(redBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
-		}
-		else if (level[i] == 2) {
+			break;
+		case 2:
 			al_draw_bitmap(greenBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
-		}
-		else if (level[i] == 3) {
+			break;
+		case 3:
 			al_draw_bitmap(blueBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
-		}
-		else if (level[i] == 4) {
+			break;
+		case 4:
 			al_draw_bitmap(yellowBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
-		}
-		else if (level[i] == 5) {
+			break;
+		case 5:
 			al_draw_bitmap(moveBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
+			break;
+		case 6:
+			al_draw_bitmap(mazePlayer, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
+			break;
 		}
 	}
 	al_flip_display();
@@ -69,6 +75,7 @@ int main()
 	blueBlock = al_load_bitmap("blueBlock.png");
 	yellowBlock = al_load_bitmap("yellowBlock.png");
 	moveBlock = al_load_bitmap("moveBlock.png");
+	mazePlayer = al_load_bitmap("mazePlayer.png");
 
 	// timer
 	timer = al_create_timer(FPS);
