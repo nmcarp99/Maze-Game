@@ -39,11 +39,10 @@ int level[] = {
 int playerPos[2] = { 0, 0 };
 
 int getLevelPositioning() {
-//	for (int i = 0; i < 225; i++) {
-	int i = 0;
+	for (int i = 0; i < 225; i++) {
 		levelWidthPosition[i] = ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350;
 		levelHeightPosition[i] = (((i - (i % 15)) / 15) * 25) + 160;
-//	}
+	}
 	return 0;
 }
 
