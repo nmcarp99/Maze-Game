@@ -14,13 +14,19 @@ ALLEGRO_BITMAP* yellowBlock = NULL;
 ALLEGRO_BITMAP* moveBlock = NULL;
 ALLEGRO_BITMAP* mazePlayer = NULL;
 
-const float FPS = 1.0 / 1;
+// keys
+bool key_up = false;
+bool key_down = false;
+bool key_right = false;
+bool key_left = false;
+
+const float FPS = 1.0 / 60;
 int levelWidthPosition[225] = {};
 int levelHeightPosition[225] = {};
 
 int level[] = {
-	6, 0, 0, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5,
-	2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1,
+	0, 0, 0, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5,
+	6, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1,
 	3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2,
 	4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3,
 	5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4,
@@ -36,7 +42,7 @@ int level[] = {
 	5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4
 };
 
-int playerPos[2] = { 0, 0 };
+int playerPos = 15;
 
 int getLevelPositioning() {
 	for (int i = 0; i < 225; i++) {
@@ -51,26 +57,85 @@ int draw() {
 	for (int i = 0; i < 225; ++i) {
 		switch (level[i]) {
 		case 1:
-			al_draw_bitmap(redBlock, levelWidthPosition[i], (((i - (i % 15)) / 15) * 25) + 160, 0);
+			al_draw_bitmap(redBlock, levelWidthPosition[i], levelHeightPosition[i], 0);
 			break;
 		case 2:
-			al_draw_bitmap(greenBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
+			al_draw_bitmap(greenBlock, levelWidthPosition[i], levelHeightPosition[i], 0);
 			break;
 		case 3:
-			al_draw_bitmap(blueBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
+			al_draw_bitmap(blueBlock, levelWidthPosition[i], levelHeightPosition[i], 0);
 			break;
 		case 4:
-			al_draw_bitmap(yellowBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
+			al_draw_bitmap(yellowBlock, levelWidthPosition[i], levelHeightPosition[i], 0);
 			break;
 		case 5:
-			al_draw_bitmap(moveBlock, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
+			al_draw_bitmap(moveBlock, levelWidthPosition[i], levelHeightPosition[i], 0);
 			break;
 		case 6:
-			al_draw_bitmap(mazePlayer, ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350, (((i - (i % 15)) / 15) * 25) + 160, 0);
+			al_draw_bitmap(mazePlayer, levelWidthPosition[i], levelHeightPosition[i], 0);
 			break;
 		}
 	}
 	al_flip_display();
+	return 0;
+}
+
+int checkKeys(ALLEGRO_KEYBOARD_STATE state) {
+	if (al_key_down(&state, ALLEGRO_KEY_RIGHT)) {
+		if (key_right == false) {
+			key_right = true;
+		}
+	}
+	else if (key_right == true) {
+		key_right = false;
+		if (level[playerPos + 1] == 0 && playerPos + 1 <= 254) {
+			level[playerPos + 1] = 6;
+			level[playerPos] = 0;
+			playerPos += 1;
+		}
+	}
+
+	if (al_key_down(&state, ALLEGRO_KEY_LEFT)) {
+		if (key_left == false) {
+			key_left = true;
+		}
+	}
+	else if (key_left == true) {
+		key_left = false;
+		if (level[playerPos - 1] == 0 && playerPos - 1 >= 0) {
+			level[playerPos - 1] = 6;
+			level[playerPos] = 0;
+			playerPos -= 1;
+		}
+	}
+
+	if (al_key_down(&state, ALLEGRO_KEY_UP)) {
+		if (key_up == false) {
+			key_up = true;
+		}
+	}
+	else if (key_up == true) {
+		key_up = false;
+		if (level[playerPos - 15] == 0 && playerPos - 15 >= 0) {
+			level[playerPos - 15] = 6;
+			level[playerPos] = 0;
+			playerPos -= 15;
+		}
+	}
+
+	if (al_key_down(&state, ALLEGRO_KEY_DOWN)) {
+		if (key_down == false) {
+			key_down = true;
+		}
+	}
+	else if (key_down == true) {
+		key_down = false;
+		if (level[playerPos + 15] == 0 && playerPos + 15 <= 254) {
+			level[playerPos + 15] = 6;
+			level[playerPos] = 0;
+			playerPos += 15;
+		}
+	}
 	return 0;
 }
 
@@ -122,11 +187,7 @@ int main()
 		al_get_keyboard_state(&state);
 		al_wait_for_event_until(event_queue, &event, &timeout);
 
-		if (al_key_down(&state, ALLEGRO_KEY_RIGHT) && level[playerPos[0] + 1] == 0) {
-			level[playerPos[0] + 1] = 6;
-			level[playerPos[0]] = 0;
-			playerPos[0] += 1;
-		}
+		checkKeys(state);
 
 		switch (event.type)
 		{
