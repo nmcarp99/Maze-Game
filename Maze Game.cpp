@@ -1,4 +1,6 @@
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_image.h>
 
 ALLEGRO_DISPLAY* display = NULL;
@@ -14,6 +16,13 @@ ALLEGRO_BITMAP* yellowBlock = NULL;
 ALLEGRO_BITMAP* moveBlock = NULL;
 ALLEGRO_BITMAP* mazePlayer = NULL;
 
+// samples and sample instances
+ALLEGRO_SAMPLE* mainIntro = NULL;
+ALLEGRO_SAMPLE* mainLoop = NULL;
+
+ALLEGRO_SAMPLE_INSTANCE* mainIntroInstance = NULL;
+ALLEGRO_SAMPLE_INSTANCE* mainLoopInstance = NULL;
+
 // keys
 bool key_up = false;
 bool key_down = false;
@@ -25,29 +34,29 @@ int levelWidthPosition[225] = {};
 int levelHeightPosition[225] = {};
 
 int level[] = {
-	0, 0, 0, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5,
-	6, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1,
-	3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2,
-	4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3,
-	5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4,
-	1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5,
-	2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1,
-	3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2,
-	4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3,
-	5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4,
-	1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5,
-	2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1,
-	3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2,
-	4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3,
-	5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4
+	6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0
 };
 
-int playerPos = 15;
+int playerPos = 0;
 
 int getLevelPositioning() {
 	for (int i = 0; i < 225; i++) {
-		levelWidthPosition[i] = ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 350;
-		levelHeightPosition[i] = (((i - (i % 15)) / 15) * 25) + 160;
+		levelWidthPosition[i] = ((i % 15) * 50) - (((i - (i % 15)) / 15) * 25) + 197.5 + ((1080/2)-387.5);
+		levelHeightPosition[i] = (((i - (i % 15)) / 15) * 25) + 160 + ((640 / 2) - 292.5);
 	}
 	return 0;
 }
@@ -88,7 +97,7 @@ int checkKeys(ALLEGRO_KEYBOARD_STATE state) {
 	}
 	else if (key_right == true) {
 		key_right = false;
-		if (level[playerPos + 1] == 0 && playerPos + 1 <= 254) {
+		if (level[playerPos + 1] == 0 && playerPos + 1 <= 224) {
 			level[playerPos + 1] = 6;
 			level[playerPos] = 0;
 			playerPos += 1;
@@ -130,7 +139,7 @@ int checkKeys(ALLEGRO_KEYBOARD_STATE state) {
 	}
 	else if (key_down == true) {
 		key_down = false;
-		if (level[playerPos + 15] == 0 && playerPos + 15 <= 254) {
+		if (level[playerPos + 15] == 0 && playerPos + 15 <= 224) {
 			level[playerPos + 15] = 6;
 			level[playerPos] = 0;
 			playerPos += 15;
@@ -145,6 +154,8 @@ int main()
 	al_init();
 	al_init_image_addon();
 	al_install_keyboard();
+	al_init_acodec_addon();
+	al_install_audio();
 
 	// load bitmaps
 	icon = al_load_bitmap("icon.jpg");
@@ -154,6 +165,19 @@ int main()
 	yellowBlock = al_load_bitmap("yellowBlock.png");
 	moveBlock = al_load_bitmap("moveBlock.png");
 	mazePlayer = al_load_bitmap("mazePlayer.png");
+
+	// sound
+	al_reserve_samples(2);
+	mainIntro = al_load_sample("mainIntro.wav");
+	mainLoop = al_load_sample("mainLoop.wav");
+
+	mainIntroInstance = al_create_sample_instance(mainIntro);
+	mainLoopInstance = al_create_sample_instance(mainLoop);
+
+	al_attach_sample_instance_to_mixer(mainIntroInstance, al_get_default_mixer());
+	al_attach_sample_instance_to_mixer(mainLoopInstance, al_get_default_mixer());
+
+	al_set_sample_instance_playmode(mainLoopInstance, ALLEGRO_PLAYMODE_LOOP);
 
 	// timer
 	timer = al_create_timer(FPS);
@@ -175,28 +199,45 @@ int main()
 	// create map positioning
 	getLevelPositioning();
 
+	al_play_sample_instance(mainIntroInstance);
+
 	bool running = true;
+	bool introDone = false;
 
 	while (running)
 	{
 		ALLEGRO_EVENT event;
 		ALLEGRO_TIMEOUT timeout;
-		ALLEGRO_KEYBOARD_STATE state;
+		ALLEGRO_KEYBOARD_STATE keyboard;
 
 		al_init_timeout(&timeout, FPS);
-		al_get_keyboard_state(&state);
-		al_wait_for_event_until(event_queue, &event, &timeout);
+		al_get_keyboard_state(&keyboard);
 
-		checkKeys(state);
+		if (!introDone) {
+			if (!al_get_sample_instance_playing(mainIntroInstance)) {
+				introDone = true;
+				al_play_sample_instance(mainLoopInstance);
+			}
+		}
 
-		switch (event.type)
-		{
-		case ALLEGRO_EVENT_DISPLAY_CLOSE:
-			running = false;
-			break;
-		case ALLEGRO_EVENT_TIMER:
-			draw();
-			break;
+		checkKeys(keyboard);
+
+
+		if (playerPos != 224) {
+			al_wait_for_event_until(event_queue, &event, &timeout);
+
+			switch (event.type)
+			{
+			case ALLEGRO_EVENT_DISPLAY_CLOSE:
+				running = false;
+				break;
+			case ALLEGRO_EVENT_TIMER:
+				draw();
+				break;
+			}
+		}
+		else {
+			return 0;
 		}
 	}
 }
