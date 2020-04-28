@@ -21,9 +21,11 @@ ALLEGRO_BITMAP* mazePlayer = NULL;
 // samples and sample instances
 ALLEGRO_SAMPLE* mainIntro = NULL;
 ALLEGRO_SAMPLE* mainLoop = NULL;
+ALLEGRO_SAMPLE* finishedNoise = NULL;
 
 ALLEGRO_SAMPLE_INSTANCE* mainIntroInstance = NULL;
 ALLEGRO_SAMPLE_INSTANCE* mainLoopInstance = NULL;
+ALLEGRO_SAMPLE_INSTANCE* finishedNoiseInstance = NULL;
 
 // keys
 bool key_up = false;
@@ -207,15 +209,18 @@ int main()
 	mazePlayer = al_load_bitmap("mazePlayer.png");
 
 	// sound
-	al_reserve_samples(2);
+	al_reserve_samples(3);
 	mainIntro = al_load_sample("mainIntro.wav");
 	mainLoop = al_load_sample("mainLoop.wav");
+	finishedNoise = al_load_sample("finishedNoise.wav");
 
 	mainIntroInstance = al_create_sample_instance(mainIntro);
 	mainLoopInstance = al_create_sample_instance(mainLoop);
+	finishedNoiseInstance = al_create_sample_instance(finishedNoise);
 
 	al_attach_sample_instance_to_mixer(mainIntroInstance, al_get_default_mixer());
 	al_attach_sample_instance_to_mixer(mainLoopInstance, al_get_default_mixer());
+	al_attach_sample_instance_to_mixer(finishedNoiseInstance, al_get_default_mixer());
 
 	al_set_sample_instance_playmode(mainLoopInstance, ALLEGRO_PLAYMODE_LOOP);
 
@@ -281,6 +286,10 @@ int main()
 			}
 		}
 		else {
+			al_stop_sample_instance(mainLoopInstance);
+			al_stop_sample_instance(mainIntroInstance);
+			al_play_sample_instance(finishedNoiseInstance);
+			while (al_get_sample_instance_playing(finishedNoiseInstance)) {}
 			return 0;
 		}
 	}
